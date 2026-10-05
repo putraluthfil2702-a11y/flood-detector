@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FloodGuard Malaysia | Smart Flood Detection System</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f8fc;
+            color: #12263a;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================== */
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid #e5eaf0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 18px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0866c6;
+        }
+
+        .logo span {
+            color: #00a8cc;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #34495e;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #0878d1;
+        }
+
+        /* =========================
+           HERO
+        ========================== */
+
+        .hero {
+            min-height: 100vh;
+            padding: 150px 8% 100px;
+            display: flex;
+            align-items: center;
+            background:
+                linear-gradient(135deg, #eaf7ff 0%, #f7fbff 55%, #e8f9ff 100%);
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #dff4ff;
+            color: #0878d1;
+            padding: 8px 14px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 6vw, 72px);
+            line-height: 1.05;
+            margin-bottom: 25px;
+            color: #102a43;
+        }
+
+        .hero h1 span {
+            color: #0878d1;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #526777;
+            max-width: 650px;
+            margin-bottom: 35px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: 0.3s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #0878d1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(8,120,209,0.25);
+        }
+
+        .btn-outline {
+            border: 2px solid #0878d1;
+            color: #0878d1;
+            background: white;
+        }
+
+        .btn-outline:hover {
+            background: #0878d1;
+            color: white;
+        }
+
+        /* Flood illustration */
+
+        .hero-visual {
+            position: relative;
+            height: 450px;
+            border-radius: 30px;
+            background: linear-gradient(160deg, #0878d1, #00a8cc);
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(8,120,209,0.25);
+        }
+
+        .water {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 55%;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .house {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 130px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .roof {
+            position: absolute;
+            top: -70px;
+            left: -20px;
+            width: 0;
+            height: 0;
+            border-left: 110px solid transparent;
+            border-right: 110px solid transparent;
+            border-bottom: 90px solid #153b59;
+        }
+
+        .window {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: #8fdcff;
+            border: 4px solid #153b59;
+            top: 30px;
+        }
+
+        .window.one {
+            left: 25px;
+        }
+
+        .window.two {
+            right: 25px;
+        }
+
+        .door {
+            position: absolute;
+            bottom: 0;
+            left: 72px;
+            width: 40px;
+            height: 70px;
+            background: #153b59;
+        }
+
+        .sensor {
+            position: absolute;
+            right: 60px;
+            top: 70px;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0878d1;
+            font-size: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        /* =========================
+           GENERAL
+        ========================== */
+
+        section {
+            padding: 100px 8%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #102a43;
+        }
+
+        .section-title p {
+            color: #6b7c8c;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        /* =========================
+           STATISTICS
+        ========================== */
+
+        .stats {
+            background: white;
+        }
+
+        .stat-grid {
+            max-width: 1200px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            padding: 30px;
+            border-radius: 18px;
+            background: #f6faff;
+            border: 1px solid #e3edf5;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 15px 35px rgba(18,38,58,0.08);
+        }
+
+        .stat-icon {
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0878d1;
+        }
+
+        .stat-label {
+            color: #607080;
+            font-size: 14px;
+        }
+
+        .source-note {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: #7b8794;
+        }
+
+        /* =========================
+           DASHBOARD
+        ========================== */
+
+        .dashboard {
+            background: #f5f8fc;
+        }
+
+        .dashboard-grid {
+            max-width: 1200px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(18,38,58,0.05);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 25px;
+        }
+
+        /* =========================
+           FLOOD DETECTOR
+        ========================== */
+
+        .detector {
+            background: linear-gradient(135deg,#092f4f,#075985);
+            color: white;
+        }
+
+        .detector-container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .detector-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .detector-title h2 {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .detector-title p {
+            color: #c8e7f7;
+        }
+
+        .monitor {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 25px;
+            padding: 35px;
+            backdrop-filter: blur(10px);
+        }
+
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 20px;
+        }
+
+        .monitor-card {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        .monitor-card small {
+            color: #a9d8ed;
+        }
+
+        .monitor-value {
+            font-size: 30px;
+            font-weight: 800;
+            margin-top: 5px;
+        }
+
+        .risk {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(0,255,150,0.12);
+            border: 1px solid rgba(0,255,150,0.3);
+            text-align: center;
+        }
+
+        .risk strong {
+            font-size: 24px;
+            color: #74f5bc;
+        }
+
+        /* =========================
+           HOW IT WORKS
+        ========================== */
+
+        .steps {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 20px;
+        }
+
+        .step {
+            text-align: center;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #e5edf4;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #0878d1;
+            color: white;
+            margin: auto auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .step h3 {
+            margin-bottom: 10px;
+        }
+
+        .step p {
+            color: #6b7c8c;
+            font-size: 14px;
+        }
+
+        /* =========================
+           FEATURES
+        ========================== */
+
+        .features {
+            background: white;
+        }
+
+        .feature-grid {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 25px;
+        }
+
+        .feature {
+            padding: 30px;
+            border-radius: 20px;
+            background: #f7faff;
+            border: 1px solid #e6eef5;
+        }
+
+        .feature-icon {
+            font-size: 35px;
+            margin-bottom: 15px;
+        }
+
+        .feature h3 {
+            margin-bottom: 10px;
+        }
+
+        .feature p {
+            color: #6b7c8c;
+            font-size: 14px;
+        }
+
+        /* =========================
+           BUSINESS
+        ========================== */
+
+        .business {
+            background: #f5f8fc;
+        }
+
+        .business-container {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .business h2 {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .business p {
+            color: #657786;
+            margin-bottom: 20px;
+        }
+
+        .business-list {
+            list-style: none;
+        }
+
+        .business-list li {
+            padding: 10px 0;
+            font-weight: 600;
+        }
+
+        .business-list li::before {
+            content: "✓";
+            color: #0878d1;
+            margin-right: 10px;
+        }
+
+        .price-card {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(18,38,58,0.08);
+        }
+
+        .price-card h3 {
+            color: #0878d1;
+        }
+
+        .price {
+            font-size: 45px;
+            font-weight: 800;
+            margin: 15px 0;
+        }
+
+        /* =========================
+           TEAM
+        ========================== */
+
+        .team {
+            background: white;
+        }
+
+        .team-grid {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(5,1fr);
+            gap: 20px;
+        }
+
+        .member {
+            text-align: center;
+            padding: 25px 15px;
+            border-radius: 20px;
+            background: #f7faff;
+            border: 1px solid #e5edf4;
+            transition: 0.3s;
+        }
+
+        .member:hover {
+            transform: translateY(-8px);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#0878d1,#00a8cc);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: auto auto 15px;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .member h3 {
+            font-size: 16px;
+        }
+
+        .member p {
+            color: #0878d1;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* =========================
+           SOURCES
+        ========================== */
+
+        .sources {
+            background: #f5f8fc;
+        }
+
+        .source-box {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+        }
+
+        .source-box a {
+            display: block;
+            color: #0878d1;
+            margin: 12px 0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .source-box a:hover {
+            text-decoration: underline;
+        }
+
+        /* =========================
+           FOOTER
+        ========================== */
+
+        footer {
+            background: #081d2e;
+            color: white;
+            padding: 60px 8% 25px;
+        }
+
+        .footer-content {
+            max-width: 1100px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        footer h2 {
+            margin-bottom: 10px;
+        }
+
+        footer p {
+            color: #a8bac8;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #8193a2;
+            font-size: 13px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media(max-width: 900px) {
+
+            .hero-content,
+            .business-container,
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2,1fr);
+            }
+
+            .steps {
+                grid-template-columns: repeat(2,1fr);
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(3,1fr);
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media(max-width: 600px) {
+
+            section {
+                padding: 70px 5%;
+            }
+
+            .hero {
+                padding: 130px 5% 70px;
+            }
+
+            .hero-visual {
+                height: 350px;
+            }
+
+            .stat-grid,
+            .monitor-grid,
+            .steps,
+            .feature-grid,
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title h2,
+            .detector-title h2,
+            .business h2 {
+                font-size: 32px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- =========================
+     NAVIGATION
+========================== -->
+
+<nav>
+    <div class="nav-container">
+
+        <div class="logo">
+            Flood<span>Guard</span>
+        </div>
+
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#statistics">Statistics</a></li>
+            <li><a href="#detector">Detector</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#team">Team</a></li>
+        </ul>
+
+    </div>
+</nav>
+
+
+<!-- =========================
+     HERO
+========================== -->
+
+<section class="hero" id="home">
+
+    <div class="hero-content">
+
+        <div>
+
+            <div class="badge">
+                SMART FLOOD MONITORING SYSTEM
+            </div>
+
+            <h1>
+                Detect Floods.<br>
+                <span>Protect Lives.</span>
+            </h1>
+
+            <p>
+                FloodGuard is a smart flood detection and monitoring
+                solution designed to provide early warnings by monitoring
+                water levels and environmental conditions.
+            </p>
+
+            <div class="buttons">
+
+                <a href="#detector" class="btn btn-primary">
+                    Explore Detector
+                </a>
+
+                <a href="#statistics" class="btn btn-outline">
+                    View Statistics
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-visual">
+
+            <div class="sensor">
+                💧
+            </div>
+
+            <div class="house">
+
+                <div class="roof"></div>
+
+                <div class="window one"></div>
+                <div class="window two"></div>
+
+                <div class="door"></div>
+
+            </div>
+
+            <div class="water"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     STATISTICS
+========================== -->
+
+<section class="stats" id="statistics">
+
+    <div class="section-title">
+
+        <h2>Malaysia Flood Statistics</h2>
+
+        <p>
+            Latest available official national flood-loss statistics
+            and selected monitoring information.
+        </p>
+
+    </div>
+
+
+    <div class="stat-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-icon">💰</div>
+
+            <div class="stat-number">
+                RM636.9M
+            </div>
+
+            <div class="stat-label">
+                Total flood losses in Malaysia, 2025
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">🏗️</div>
+
+            <div class="stat-number">
+                RM380.2M
+            </div>
+
+            <div class="stat-label">
+                Public assets & infrastructure losses
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">🏠</div>
+
+            <div class="stat-number">
+                RM183.8M
+            </div>
+
+            <div class="stat-label">
+                Living quarters losses
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">🌾</div>
+
+            <div class="stat-number">
+                RM52.6M
+            </div>
+
+            <div class="stat-label">
+                Agriculture sector losses
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="source-note">
+
+        Source: Department of Statistics Malaysia (DOSM),
+        Special Report on Impact of Floods in Malaysia 2025.
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     DATA DASHBOARD
+========================== -->
+
+<section class="dashboard">
+
+    <div class="section-title">
+
+        <h2>Flood Impact Dashboard</h2>
+
+        <p>
+            Visual representation of flood-related losses reported
+            by the Department of Statistics Malaysia.
+        </p>
+
+    </div>
+
+
+    <div class="dashboard-grid">
+
+        <div class="chart-card">
+
+            <h3>
+                Flood Losses by Category
+            </h3>
+
+            <canvas id="lossChart"></canvas>
+
+        </div>
+
+
+        <div class="chart-card">
+
+            <h3>
+                2024 vs 2025 Total Losses
+            </h3>
+
+            <canvas id="yearChart"></canvas>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FLOOD DETECTOR
+========================== -->
+
+<section class="detector" id="detector">
+
+    <div class="detector-container">
+
+        <div class="detector-title">
+
+            <h2>FloodGuard Monitoring System</h2>
+
+            <p>
+                A conceptual real-time monitoring dashboard for
+                water-level based flood detection.
+            </p>
+
+        </div>
+
+
+        <div class="monitor">
+
+            <div class="monitor-grid">
+
+                <div class="monitor-card">
+
+                    <small>
+                        Water Level
+                    </small>
+
+                    <div class="monitor-value">
+                        <span id="waterLevel">1.24</span> m
+                    </div>
+
+                </div>
+
+
+                <div class="monitor-card">
+
+                    <small>
+                        Rainfall
+                    </small>
+
+                    <div class="monitor-value">
+                        <span id="rainfall">32</span> mm
+                    </div>
+
+                </div>
+
+
+                <div class="monitor-card">
+
+                    <small>
+                        Sensor Status
+                    </small>
+
+                    <div class="monitor-value">
+                        ● ONLINE
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="risk">
+
+                Current Risk Status
+
+                <br>
+
+                <strong id="riskStatus">
+                    LOW RISK
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     HOW IT WORKS
+========================== -->
+
+<section>
+
+    <div class="section-title">
+
+        <h2>How FloodGuard Works</h2>
+
+        <p>
+            Four simple stages from environmental monitoring
+            to emergency notification.
+        </p>
+
+    </div>
+
+
+    <div class="steps">
+
+        <div class="step">
+
+            <div class="step-number">
+                01
+            </div>
+
+            <h3>Detect</h3>
+
+            <p>
+                Sensors continuously measure water level
+                and environmental conditions.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-number">
+                02
+            </div>
+
+            <h3>Analyse</h3>
+
+            <p>
+                The system analyses sensor readings against
+                predefined flood-risk thresholds.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-number">
+                03
+            </div>
+
+            <h3>Alert</h3>
+
+            <p>
+                When the water level becomes dangerous,
+                the system can generate an early warning through the app.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-number">
+                04
+            </div>
+
+            <h3>Respond</h3>
+
+            <p>
+                Users can take preventive action and
+                prepare for possible evacuation using the best routes.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FEATURES
+========================== -->
+
+<section class="features" id="features">
+
+    <div class="section-title">
+
+        <h2>System Features</h2>
+
+        <p>
+            Designed to combine monitoring, data analysis
+            and early-warning capabilities.
+        </p>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                🌊
+            </div>
+
+            <h3>
+                Water Level Monitoring
+            </h3>
+
+            <p>
+                Continuously monitor water levels using
+                flood detection sensors.
+            </p>
+
+        </div>
+
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                🌧️
+            </div>
+
+            <h3>
+                Rainfall Monitoring
+            </h3>
+
+            <p>
+                Rainfall information can be combined with
+                water-level data to improve risk assessment.
+            </p>
+
+        </div>
+
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                🚨
+            </div>
+
+            <h3>
+                Early Warning
+            </h3>
+
+            <p>
+                Generate warning notifications when
+                predefined thresholds are reached.
+            </p>
+
+        </div>
+
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                📊
+            </div>
+
+            <h3>
+                Data Dashboard
+            </h3>
+
+            <p>
+                Present environmental data through
+                easy-to-understand charts and indicators.
+            </p>
+
+        </div>
+
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                📍
+            </div>
+
+            <h3>
+                Location Monitoring
+            </h3>
+
+            <p>
+                Multiple sensor locations can be monitored
+                from a central dashboard.
+            </p>
+
+        </div>
+
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                📱
+            </div>
+
+            <h3>
+                Mobile Friendly
+            </h3>
+
+            <p>
+                Responsive interface allows users to view
+                important information on different devices.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     BUSINESS
+========================== -->
+
+<section class="business">
+
+    <div class="business-container">
+
+        <div>
+
+            <h2>
+                From Student Project
+                to Smart City Solution
+            </h2>
+
+            <p>
+                FloodGuard can be developed into a scalable
+                flood monitoring solution for residential areas,
+                businesses, schools and local communities.
+            </p>
+
+            <ul class="business-list">
+
+                <li>
+                    Residential flood monitoring
+                </li>
+
+                <li>
+                    Smart community monitoring
+                </li>
+
+                <li>
+                    Industrial flood protection
+                </li>
+
+                <li>
+                    School and campus monitoring
+                </li>
+
+                <li>
+                    Local authority applications
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <div class="price-card">
+
+            <h3>
+                FLOODGUARD SYSTEM
+            </h3>
+
+            <div class="price">
+                SMART
+            </div>
+
+            <p>
+                Sensor + monitoring dashboard +
+                early warning system.
+            </p>
+
+            <br>
+
+            <a href="#team" class="btn btn-primary">
+                Meet Our Team
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     TEAM
+========================== -->
+
+<section class="team" id="team">
+
+    <div class="section-title">
+
+        <h2>Meet Our Team</h2>
+
+        <p>
+            Five members working together to develop
+            FloodGuard.
+        </p>
+
+    </div>
+
+
+    <div class="team-grid">
+
+        <div class="member">
+
+
+            <h3>
+                MUHAMMAD AQIF DANIAL BIN MOHD RASID&nbsp;</h3>
+
+            <p>
+                Project Leader
+            </p>
+            <img 
+    src="images/whatsapp-image-2026-09-29-at-10-39-02-pm.jpeg" 
+    alt="image description" 
+    width="150">
+     
+        </div>
+
+
+        <div class="member">
+
+
+            <h3>MIOR MUHAMMAD HAKIM BIN MIOR HAMDAN&nbsp;</h3>
+
+            <p>
+                Hardware & Sensor
+            </p>
+            <img src="images/whatsapp-image-2026-09-29-at-10-32-55-pm.jpeg" 
+     alt="image description" 
+     width="150">
+
+     
+
+        </div>
+
+
+        <div class="member">
+
+
+            <h3>
+                RUBENRAJ A/L POOVANESAN&nbsp;</h3>
+
+            <p>
+                Software Developer
+            </p>
+            <img src="images/whatsapp-image-2026-09-29-at-10-32-24-pm.jpeg" 
+     alt="image description" 
+     width="150">
+        </div>
+
+
+        <div class="member">
+
+
+            <h3>
+                PUTRA LUTHFIL HADY BIN AHMAD TAJUDIN</h3>
+
+            <p>
+                Data Analyst
+            </p>
+           <img src="images/whatsapp-image-2026-09-29-at-10-39-28-pm.jpeg" 
+     alt="image description" 
+     width="150">
+        </div>
+
+
+        <div class="member">
+
+
+            <h3>
+                MUHAMMAD HADI WAZIF BIN HISHAM</h3>
+
+            <p>Designer&nbsp;</p>
+            <img src="images/whatsapp-image-2026-09-29-at-10-32-34-pm.jpeg" 
+     alt="image description" 
+     width="150">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     SOURCES
+========================== -->
+
+<section class="sources">
+
+    <div class="section-title">
+
+        <h2>Official Data Sources</h2>
+
+        <p>
+            FloodGuard uses official public information
+            as references for flood awareness and monitoring.
+        </p>
+
+    </div>
+
+
+    <div class="source-box">
+
+        <a href="https://www.dosm.gov.my/"
+           target="_blank">
+
+            Department of Statistics Malaysia (DOSM)
+
+        </a>
+
+
+        <a href="https://publicinfobanjir.water.gov.my/"
+           target="_blank">
+
+            Public InfoBanjir — Department of Irrigation
+            and Drainage Malaysia
+
+        </a>
+
+
+        <a href="https://publicinfobanjir.water.gov.my/aras-air/?lang=en"
+           target="_blank">
+
+            Public InfoBanjir — Current Water Level Monitoring
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FOOTER
+========================== -->
+
+<footer>
+
+    <div class="footer-content">
+
+        <div>
+
+            <h2>
+                FloodGuard Malaysia
+            </h2>
+
+            <p>
+                Smart Flood Detection & Early Warning System
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <p>
+                Built by a team of 5 students
+            </p>
+
+            <p>
+                Innovation • Technology • Safety
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="copyright">
+
+        © 2026 FloodGuard Malaysia. Student Innovation Project.
+
+    </div>
+
+</footer>
+
+
+<!-- =========================
+     JAVASCRIPT
+========================== -->
+
+<script>
+
+    /* =========================
+       FLOOD LOSS CHART
+    ========================== */
+
+    const lossChart =
+        document.getElementById('lossChart');
+
+    new Chart(lossChart, {
+
+        type: 'doughnut',
+
+        data: {
+
+            labels: [
+                'Public Assets & Infrastructure',
+                'Living Quarters',
+                'Agriculture',
+                'Business Premises',
+                'Vehicles',
+                'Manufacturing'
+            ],
+
+            datasets: [{
+
+                data: [
+                    380.2,
+                    183.8,
+                    52.6,
+                    13.4,
+                    6.8,
+                    0.1
+                ],
+
+                borderWidth: 0
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            plugins: {
+
+                legend: {
+                    position: 'bottom'
+                },
+
+                tooltip: {
+
+                    callbacks: {
+
+                        label: function(context) {
+
+                            return context.label +
+                                ': RM' +
+                                context.raw +
+                                ' million';
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+
+    /* =========================
+       YEAR COMPARISON
+    ========================== */
+
+    const yearChart =
+        document.getElementById('yearChart');
+
+    new Chart(yearChart, {
+
+        type: 'bar',
+
+        data: {
+
+            labels: [
+                '2024',
+                '2025'
+            ],
+
+            datasets: [{
+
+                label: 'Flood Losses (RM million)',
+
+                data: [
+                    933.4,
+                    636.9
+                ],
+
+                borderRadius: 8
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    title: {
+
+                        display: true,
+
+                        text: 'RM Million'
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+
+    /* =========================
+       DEMO SENSOR
+    ========================== */
+
+    function updateSensor() {
+
+        let water =
+            (1.15 + Math.random() * 0.25).toFixed(2);
+
+        let rain =
+            Math.floor(20 + Math.random() * 30);
+
+        document.getElementById(
+            "waterLevel"
+        ).textContent = water;
+
+        document.getElementById(
+            "rainfall"
+        ).textContent = rain;
+
+
+        let risk =
+            document.getElementById("riskStatus");
+
+
+        if (water >= 1.32) {
+
+            risk.textContent = "HIGH RISK";
+
+            risk.style.color = "#ff8a8a";
+
+        }
+
+        else if (water >= 1.25) {
+
+            risk.textContent = "MODERATE RISK";
+
+            risk.style.color = "#ffd166";
+
+        }
+
+        else {
+
+            risk.textContent = "LOW RISK";
+
+            risk.style.color = "#74f5bc";
+
+        }
+
+    }
+
+
+    setInterval(updateSensor, 3000);
+
+</script>
+
+</body>
+</html>
